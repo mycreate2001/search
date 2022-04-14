@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>search</title>
+</head>
+<body>
+    <div class="search">
+        <input placeholder="typing your keyword" class="search_input">
+        <button class="search_button">Search</button>
+    </div>
+    <div class="result" id="content"></div>
+    <script>
+        const btn=document.querySelector("button.search_button")
+        btn.addEventListener("click",()=>{
+            const keyword=document.querySelector("input.search_input");
+            const keys=(keyword.value+"").trim().split(/[;,.: ]/g).filter(x=>x&&x!=' ');
+            console.log({keys})
+
+            fetch('/api/search?q='+keys.join("+")).then(res=>res.json())
+            .then(result=>{
+                
+                const arrs=result.arrs;
+                console.log({arrs,error:result.error})
+                const content=arrs.map(data=>`
+                    <a href='${data.url}' class='item'>
+                        <img src='${data.image}' class='item_image'>
+                        <div class='item_title'>${data.name}</div>
+                        <div class='item_price'>${data.price}</div>
+                    </a>
+                `)
+                document.querySelector('#content').innerHTML=content
+            })
+
+        })
+    </script>
+</body>
+</html>
