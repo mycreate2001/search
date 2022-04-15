@@ -13,7 +13,6 @@ const webs=[
             key:'img.lazy',
             attr:'data-src'
         },
-        /** @type NodeData */
         name:{
             key:'h3.p-name'
         },
@@ -28,20 +27,46 @@ const webs=[
         }
     },
     {
-        root:"hc.com.vn/ords",
-        search:'/search--',
-        delimiter:'%20',
-        key:'a.mepuzz__suggests__item-detail-61542cbc7dbe720140355ea5',
+        root:'https://mediamart.vn',
+        search:'/tag?key=',
+        delimiter:'+',
+        key:'div.card.mb-4',
         image:{
-            key:'img.lazy',
-            attr:'src'
+            key:'source[type="image/jpeg"]',
+            attr:'srcset'
         },
         name:{
-            key:'div.mepuzz__suggests__item-title',
+            key:'h5.card-title'
         },
         price:{
-            key:'div.mepuzz__suggests__item-price-discount'
+            key:'p.product-price'
+        },
+        url:{
+            key:'a',
+            attr:'href'
         }
+    },
+    {
+        root:'https://www.hanoicomputer.vn',
+        search:'/tim?q=',
+        delimiter:'+',
+        key:'div.p-component.item',
+        image:{
+            key:'img.lazy',
+            attr:'data-src'
+        },
+        name:{
+            key:'h3.p-name',
+        },
+        price:{
+            key:'span.p-price',
+
+        },
+        url:{
+            key:'div.p-img a',
+            attr:'href'
+        }
+
     }
 ]
 const PORT=80;
@@ -77,7 +102,7 @@ app.get("/api/search",(req,res)=>{
                         const node=cheerio.load(e);
                         const image=node(web.image.key).attr(web.image.attr)
                         const name=node(web.name.key).text();
-                        const price=extractString(node(web.price.key),web.price.first,web.price.last);// parseInt();
+                        const price=extractString(node(web.price.key).text(),web.price.first,web.price.last);// parseInt();
                         const url=web.root+node(web.url.key).attr(web.url.attr)
                         // console.log("\n\n=================\nimage:",{image,name,price});
                         outs.push({image,name,price,url})
@@ -92,7 +117,7 @@ app.get("/api/search",(req,res)=>{
         const arrs=result.reduce((acc,cur)=>[...acc,...cur],[])
         res.send({arrs})
     })
-    .catch(err=>res.send({arrs:[],error:err.message}))
+    .catch(err=>res.send({arrs:[],error:JSON.stringify(err)}))
 })
 
 /**
@@ -102,9 +127,6 @@ app.get("/api/search",(req,res)=>{
  * @param {string} last
  */
 function extractString(txt,first="",last=""){
-    if(typeof text!=='string') {
-        txt['toString']&&(txt=txt.toString());
-    }
     const pFirst=first.length?txt.indexOf(first):0;
     const pLast=last.length?txt.indexOf(last,pFirst):txt.length;
     // console.log("test extractString ",{txt,first,last,out:txt.substring(pFirst,pLast)})
