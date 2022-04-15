@@ -9,21 +9,24 @@ const webs=[
         search:'/tim?q=',
         delimiter:'+',
         key:'.p-container',
-        image:{
-            key:'img.lazy',
-            attr:'data-src'
-        },
-        name:{
-            key:'h3.p-name'
-        },
-        price:{
-            key:'span.p-price2',
-            first:'</i>',
-            last:' \n'
-        },
-        url:{
-            key:'a.p-img',
-            attr:'href'
+        configs:{
+            image:{
+                key:'img.lazy',
+                attr:'data-src'
+            },
+            name:{
+                key:'h3.p-name'
+            },
+            price:{
+                key:'span.p-price2:not([style])',
+                prefix:'Giá Bán',
+                ignore:/[\n:]/g
+            },
+            url:{
+                key:'a.p-img',
+                attr:'href',
+                handler:joinUrl
+            }
         }
     },
     {
@@ -31,19 +34,22 @@ const webs=[
         search:'/tag?key=',
         delimiter:'+',
         key:'div.card.mb-4',
-        image:{
-            key:'source[type="image/jpeg"]',
-            attr:'srcset'
-        },
-        name:{
-            key:'h5.card-title'
-        },
-        price:{
-            key:'p.product-price'
-        },
-        url:{
-            key:'a',
-            attr:'href'
+        configs:{
+            image:{
+                key:'source[type="image/jpeg"]',
+                attr:'srcset'
+            },
+            name:{
+                key:'h5.card-title'
+            },
+            price:{
+                key:'p.product-price'
+            },
+            url:{
+                key:'a',
+                attr:'href',
+                handler:joinUrl
+            }
         }
     },
     {
@@ -51,28 +57,57 @@ const webs=[
         search:'/tim?q=',
         delimiter:'+',
         key:'div.p-component.item',
-        image:{
-            key:'img.lazy',
-            attr:'data-src'
-        },
-        name:{
-            key:'h3.p-name',
-        },
-        price:{
-            key:'span.p-price',
-
-        },
-        url:{
-            key:'div.p-img a',
-            attr:'href'
+        configs:{
+            image:{
+                key:'img.lazy',
+                attr:'data-src'
+            },
+            name:{
+                key:'h3.p-name'
+            },
+            price:{
+                key:'span.p-price',
+    
+            },
+            url:{
+                key:'div.p-img a',
+                attr:'href',
+                handler:joinUrl
+            }
         }
 
+    },
+    //sellphones
+    {
+        root:'https://cellphones.com.vn',
+        search:'/catalogsearch/result/?q=',
+        delimiter:'+',
+        key:'div.item-product',
+        configs:{
+            image:{
+                key:'div.item-product__box-img img',
+                attr:'data-src'
+            },
+            name:{
+                key:'div.item-product__box-name',
+                ignore:'\n'
+    
+            },
+            price:{
+                key:'p.special-price'
+            },
+            url:{
+                key:'div.item-product__box-name a',
+                attr:'href',
+                handler:joinUrl
+            }
+        }
     }
 ]
+
 const PORT=80;
 
 const app=express();
-
 app.use(express.static("public"))
 app.set('view engine',"ejs");
 app.set('views','./views');
@@ -100,12 +135,19 @@ app.get("/api/search",(req,res)=>{
                     const outs=[];
                     nodes.each((i,e)=>{
                         const node=cheerio.load(e);
-                        const image=node(web.image.key).attr(web.image.attr)
-                        const name=node(web.name.key).text();
-                        const price=extractString(node(web.price.key).text(),web.price.first,web.price.last);// parseInt();
-                        const url=web.root+node(web.url.key).attr(web.url.attr)
-                        // console.log("\n\n=================\nimage:",{image,name,price});
-                        outs.push({image,name,price,url})
+                        const out={};
+                        Object.keys(web.configs).forEach(key=>{
+                            const config=web.configs[key];
+                            console.log("test-00001",{config,key})
+                            const _node=node(config.key);
+                            let value=config.attr?_node.attr(config.attr):_node.text();
+                            value=config.prefix?extractString(value,config.prefix,config.subfix):value;
+                            value=config.ignore?value.replace(config.ignore,""):value;
+                            value=(value)?value.trim():value;
+                            value=config.handler?config.handler(value,web):value;
+                            out[key]=value;
+                        })
+                        outs.push(out)
                     }) 
                     return outs;
                 }
@@ -127,9 +169,24 @@ app.get("/api/search",(req,res)=>{
  * @param {string} last
  */
 function extractString(txt,first="",last=""){
-    const pFirst=first.length?txt.indexOf(first):0;
-    const pLast=last.length?txt.indexOf(last,pFirst):txt.length;
-    // console.log("test extractString ",{txt,first,last,out:txt.substring(pFirst,pLast)})
+    txt=txt+""
+    let pFirst=first?txt.indexOf(first):0;
+    pFirst=pFirst==-1?0:pFirst
+    let pLast=last?txt.indexOf(last,pFirst):txt.length;
+    pLast=pLast==-1?txt.length:pLast;
     return txt.substring(pFirst+first.length,pLast)
+}
+
+/**
+ * 
+ * @param {string} url 
+ * @param {string} web 
+ * @returns {string}
+ */
+function joinUrl(url,web){
+    const root=web.root;
+    if(url.startsWith('/')) url=root+url;
+    else if(!url.startsWith('http')) url=root+"/"+url;
+    return url;
 }
 
