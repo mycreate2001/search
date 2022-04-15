@@ -11,16 +11,26 @@
     <div class="search">
         <input placeholder="typing your keyword" class="search_input">
         <button class="search_button">Search</button>
+        <div class="search_select">
+            <label>xắp xếp theo</label>
+            <select class="search_select_value">
+                <option value="0" selected>Giá từ thấp -> cao</option>
+                <option value="1">Giá từ cao -> thấp</option>
+            </select>
+        </div>
     </div>
     <div class="result" id="content"></div>
     <script>
+        let arrs=[];
         const btn=document.querySelector("button.search_button")
         btn.addEventListener("click",search)
         document.querySelector("input.search_input").addEventListener("keyup",(event)=>{
-            console.log("event",{event})
             if(event.keyCode==13){
                 search();
             }
+        })
+        document.querySelector("select.search_select_value").addEventListener('change',()=>{
+            console.log("change");
         })
 
         function search(){
@@ -31,19 +41,45 @@
 
             fetch('/api/search?q='+keys.join("+")).then(res=>res.json())
             .then(result=>{
-                
-                const arrs=result.arrs;
+                const select=document.querySelector('select.search_select_value').value
+                /** @type any[] */
+                arrs=result.arrs.map(arr=>{
+                    const price=getNumber(arr.price);
+                    return {...arr,price}
+                });
+                arrs=arrs.sort((a,b)=>a.price-b.price)
                 console.log({arrs,error:result.error})
+                
+
+            })
+            .then(()=>{document.body.style.cursor="initial"})
+            /** 
+             * @param {string} str
+             * @returns {number}
+             * */
+            function getNumber(str){
+                str=str+'';
+                let out=''
+                for(let i=0;i<str.length;i++){
+                    const char=str[i];
+                    if(char>='0'&& char<='9') out+=char;
+                }
+                return parseInt(out);
+            }
+
+            function sort(){
+
+            }
+            function build(select){
                 const content=arrs.map(data=>`
                     <a href='${data.url}' class='item'>
                         <img src='${data.image}' class='item_image'>
                         <div class='item_title'>${data.name}</div>
-                        <div class='item_price'>${data.price}</div>
+                        <div class='item_price'>${getNumber(data.price)}</div>
                     </a>
                 `)
-                document.querySelector('#content').innerHTML=content
-            })
-            .then(()=>{document.body.style.cursor="initial"})
+                document.querySelector(s).innerHTML=content
+            }
         }
     </script>
 </body>
