@@ -22,6 +22,7 @@
     <div class="result" id="content"></div>
     <script>
         let arrs=[];
+        let views=[];
         const btn=document.querySelector("button.search_button")
         btn.addEventListener("click",search)
         document.querySelector("input.search_input").addEventListener("keyup",(event)=>{
@@ -30,56 +31,60 @@
             }
         })
         document.querySelector("select.search_select_value").addEventListener('change',()=>{
-            console.log("change");
+            update();
         })
 
         function search(){
             document.body.style.cursor="wait"
             const keyword=document.querySelector("input.search_input");
             const keys=(keyword.value+"").trim().split(/[;,.: ]/g).filter(x=>x&&x!=' ');
-            console.log({keys})
-
             fetch('/api/search?q='+keys.join("+")).then(res=>res.json())
             .then(result=>{
-                const select=document.querySelector('select.search_select_value').value
-                /** @type any[] */
+                // console.log("result",result.arrs);
                 arrs=result.arrs.map(arr=>{
                     const price=getNumber(arr.price);
                     return {...arr,price}
                 });
-                arrs=arrs.sort((a,b)=>a.price-b.price)
-                console.log({arrs,error:result.error})
-                
-
+                console.log("result",arrs);
+                update();
             })
+            .catch(err=>{arrs=[]})
             .then(()=>{document.body.style.cursor="initial"})
-            /** 
-             * @param {string} str
-             * @returns {number}
-             * */
-            function getNumber(str){
-                str=str+'';
-                let out=''
-                for(let i=0;i<str.length;i++){
-                    const char=str[i];
-                    if(char>='0'&& char<='9') out+=char;
-                }
-                return parseInt(out);
-            }
+        }
 
-            function sort(){
+        function getNumber(str){
+            str=str+'';
+            let out=''
+            for(let i=0;i<str.length;i++){
+                const char=str[i];
+                if(char>='0'&& char<='9') out+=char;
+            }
+            return parseInt(out);
+        }
+        function dispPrice(price){
+            const out=(price).toFixed(1).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+            // console.log("debug",{input:price,output:out})
+            return out;
+        }
+        /** update */
+        function update(){
+            const select=document.querySelector('select.search_select_value').value
+            // console.log("test-select",select);
+            if(select==0)  views=arrs.sort((a,b)=>a.price-b.price)
+            else views=arrs.sort((a,b)=>b.price-a.price)
+            build('#content')
+        }
 
-            }
-            function build(select){
-                const content=arrs.map(data=>`
-                    <a href='${data.url}' class='item'>
-                        <img src='${data.image}' class='item_image'>
-                        <div class='item_title'>${data.name}</div>
-                        <div class='item_price'>${getNumber(data.price)}</div>
-                    </a>
-                `)
-                document.querySelector(s).innerHTML=content
-            }
+        /** build */
+        function build(selector){
+            const content=views.map(data=>`
+                <a href='${data.url}' class='item'>
+                    <img src='${data.image}' class='item_image'>
+                    <div class='item_title'>${data.name}</div>
+                    <div class='item_price'>${dispPrice(data.price)}</div>
+                </a>
+            `)
+            document.querySelector(selector).innerHTML=content
         }
     </script>
 </body>

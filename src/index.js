@@ -3,7 +3,8 @@ const htmlx=require('cross-fetch');
 const cheerio=require('cheerio')
 //
 const webs=[
-    {
+    {   
+        //phucanh.vn
         root:'https://www.phucanh.vn',
         search:'/tim?q=',
         delimiter:'+',
@@ -28,7 +29,8 @@ const webs=[
             }
         }
     },
-    {
+    {   
+        //mediamart.vn
         root:'https://mediamart.vn',
         search:'/tag?key=',
         delimiter:'+',
@@ -42,7 +44,8 @@ const webs=[
                 key:'h5.card-title'
             },
             price:{
-                key:'p.product-price'
+                key:'p.product-price',
+                subfix:'₫'
             },
             url:{
                 key:'a',
@@ -51,6 +54,7 @@ const webs=[
             }
         }
     },
+    //hanoicomputer
     {
         root:'https://www.hanoicomputer.vn',
         search:'/tim?q=',
@@ -66,6 +70,7 @@ const webs=[
             },
             price:{
                 key:'span.p-price',
+                attr:'data-price'
     
             },
             url:{
@@ -101,6 +106,86 @@ const webs=[
                 handler:joinUrl
             }
         }
+    },
+    //nguyenkim
+    {
+        root:'https://www.nguyenkim.com',
+        search:'/tim-kiem.html?tu-khoa=',
+        delimiter:'+',
+        key:'div.product-card',
+        configs:{
+            image:{
+                key:'img[loading="lazy"]',
+                attr:'src'
+            },
+            name:{
+                key:'div.product-card__title',
+                ignore:/[\n]/g
+            },
+            price:{
+                key:'p.product-card__price-after-amount'
+            },
+            url:{
+                key:'a',
+                attr:'href',
+                handler:joinUrl
+            }
+        }
+    },
+    //dienmayxanh.vn
+    {
+        root:'https://www.dienmayxanh.com',
+        search:'/tag/',
+        delimiter:'-',
+        search2:'?key=',
+        delimiter2:'+',
+        key:'li.item',
+        configs:{
+            image:{
+                key:'img',
+                attr:'data-src'
+            },
+            name:{
+                key:'a',
+                attr:'data-name',
+            },
+            price:{
+                key:'a',
+                attr:'data-price'
+            },
+            url:{
+                key:'a',
+                attr:'href',
+                handler:joinUrl
+            }
+        }
+
+    },
+    // thegioididong.com
+    {
+        root:'https://www.thegioididong.com',
+        search:'/tim-kiem?key=',
+        delimiter:'+',
+        key:'ul.listproduct li.item',
+        configs:{
+            image:{
+                key:'img',
+                attr:'data-src'
+            },
+            name:{
+                key:'a',
+                attr:'data-name',
+            },
+            price:{
+                key:'a',
+                attr:'data-price'
+            },
+            url:{
+                key:'a',
+                attr:'href',
+                handler:joinUrl
+            }
+        }
     }
 ]
 
@@ -120,31 +205,41 @@ app.get("/",(req,res)=>{
 
 app.get("/api/search",(req,res)=>{
     const keys=(req.query['q']).trim().split(/[,. :;+]/g);
-    console.log("001. input",{keys,params:req.query})
+    console.log("001. input '%s'",keys.join(" "))
     const alls=webs.map(web=>{
-        const _host=web.root+web.search+keys.join(web.delimiter);
+        let _host=web.root+web.search+keys.join(web.delimiter);
+        if(web.search2&&web.delimiter2) _host+=web.search2+keys.join(web.delimiter2)
+        console.log("002. fetch '%s'",_host)
         return htmlx.fetch(_host)
         .then(res=>{
-            if(res.status>=400) throw new Error("bad respond from server");
-            console.log("002. web content",{host:web.root,status:res.status})
+            // console.log("002. fetch '%s'",_host,{configs:web.configs,status:res.status})
+            if(res.status>=400) throw new Error(`bad respond from server, status:${res.status}`);
             return res.text().then(
                 (text)=>{
                     const $=cheerio.load(text);
                     const nodes=$('body').find(web.key);
+                    // if(web.root=='https://www.thegioididong.com')
+                    //     console.log("test-218:",{nodes,root:web.root,length:nodes.length})
                     const outs=[];
+                    if(!nodes.length) return outs;
+                    
                     nodes.each((i,e)=>{
                         const node=cheerio.load(e);
                         const out={};
                         Object.keys(web.configs).forEach(key=>{
                             const config=web.configs[key];
-                            console.log("test-00001",{config,key})
                             const _node=node(config.key);
                             let value=config.attr?_node.attr(config.attr):_node.text();
-                            value=config.prefix?extractString(value,config.prefix,config.subfix):value;
+                            const raw=value;
+                            value=(config.prefix||config.subfix)?extractString(value,config.prefix,config.subfix):value;
                             value=config.ignore?value.replace(config.ignore,""):value;
                             value=(value)?value.trim():value;
                             value=config.handler?config.handler(value,web):value;
                             out[key]=value;
+                            // if(web.root=='https://www.dienmayxanh.com')
+                            //     console.log({url:_host,key,value,config})
+                            if(!value)
+                                console.log("\ndebug-240:",{url:_host,key,value,raw,node:_node.toString(),config})
                         })
                         outs.push(out)
                     }) 
@@ -152,13 +247,14 @@ app.get("/api/search",(req,res)=>{
                 }
             )
         })
-        .catch(err=>{console.log({host:_host,err});throw err})
+        .catch(err=>{console.log("003. fetch error",{host:_host,err});return []})
     })
     Promise.all(alls).then(result=>{
-        const arrs=result.reduce((acc,cur)=>[...acc,...cur],[])
-        res.send({arrs})
+        const arrs=result.reduce((acc,cur)=>[...acc,...cur],[]).filter(x=>x);
+        res.send({arrs,msg:'test'})
     })
     .catch(err=>res.send({arrs:[],error:JSON.stringify(err)}))
+    .finally(()=>{console.log("done!")})
 })
 
 /**
