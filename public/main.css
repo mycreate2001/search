@@ -5,3 +5,7 @@
     /* left: 0; */
     width: 100%;
 }
+.item {
+    display: flex;
+    flex-direction: column;
+}
