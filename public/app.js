@@ -16,22 +16,38 @@ let arrs = [];
         function search() {
             document.body.style.cursor = "wait"
             const keyword = form.querySelector("input");
-            const keys = (keyword.value + "").trim().split(/[;,.: ]/g).filter(x => x && x != ' ');
-            console.log("001. Keys",keys)
+            const keys = (keyword.value + "").toLowerCase().trim().split(/[;,.: ]/g).filter(x => x && x != ' ');
+            console.log("Keys",keys)
+            views=[];
+            build('#content')
             fetch('/api/search?q=' + keys.join("+")).then(res => res.json())
                 .then(result => {
-                    // console.log("result",result.arrs);
+                    // console.log("result",{result})
                     arrs = result.arrs.map(arr => {
                         const price = getNumber(arr.price);
-                        return { ...arr, price }
-                    }).filter(x=>x&&x.price)
-                    console.log("result", arrs);
+                        let points=0;
+                        
+                        keys.forEach(key=>{
+                            let pos=(arr.name+"").toLowerCase().indexOf(key)
+                            if(pos!=-1) {
+                                points++;
+                                const _replace=(arr.name+"").substring(pos,pos+key.length);
+                                // console.log("test",{pos,_replace,key,name:arr.name})
+                                arr.name=(arr.name+"").replace(_replace,`<strong>${_replace}</strong>`)
+                            }
+                        })
+                        return { ...arr, price,points }
+                    }).filter(x=>x&&x.price&&x.points)
+
+                    // console.log("result", arrs);
                     update();
                 })
-                .catch(err => { arrs = [] })
+                .catch(err => { arrs = [];console.log(err) })
                 .then(() => { document.body.style.cursor = "initial" });
                 // e.preventDefault();
         }
+
+    
 
         function getNumber(str) {
             str = str + '';
@@ -49,20 +65,21 @@ let arrs = [];
         }
         /** update */
         function update() {
-            views = arrs.sort((a, b) => a.price - b.price)
+            views = arrs.sort((a, b) => b.points - a.points);
+            // console.log({views});
             build('#content')
         }
 
         /** build */
         function build(selector) {
-            console.log("element:",{selector,element:document.querySelector(selector)})
+            // console.log("element:",{selector,element:document.querySelector(selector)})
             const content = views.map(data => `
-                <a class='col-xs-6 col-sm-6 col-md-3 col-lg-2 item' href="${data.url}" target="_blank">
+                <div class='col-xs-6 col-sm-6 col-md-3 col-lg-3 .col-xl-3 item' >
                     <img src='${data.image}' class='item_image'>
                     <img src='${data.logo}' class='logo'>
-                    <div class='item_title' >${data.name}</div>
+                    <a class='item_title' href="${data.url}" target="_blank">${data.name}</a>
                     <div class='item_price'>${dispPrice(data.price)}</div>
-                </a>
+                </div>
             `).join("")
             document.querySelector(selector).innerHTML = content
         }

@@ -9,6 +9,7 @@
     display: flex;
     flex-direction: column;
     padding: 8px;
+    border: 0.1px whitesmoke solid;
 }
 
 img.item_image {
@@ -22,7 +23,7 @@ img.logo {
     position: absolute;
     top: 2px;
     left: 2px;
-    width: 50px;
+    width: 30%;
 }
 nav.navbar{
     position: fixed;
