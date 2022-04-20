@@ -23,7 +23,7 @@ const webs=[
             url:{
                 key:'a.p-img',
                 attr:'href',
-                handler:joinUrl
+                fn:['url']
             }
         }
     },
@@ -49,7 +49,7 @@ const webs=[
             url:{
                 key:'a',
                 attr:'href',
-                handler:joinUrl
+                fn:['url']
             }
         }
     },
@@ -76,7 +76,7 @@ const webs=[
             url:{
                 key:'div.p-img a',
                 attr:'href',
-                handler:joinUrl
+                fn:['url']
             }
         }
 
@@ -104,7 +104,7 @@ const webs=[
             url:{
                 key:'div.item-product__box-name a',
                 attr:'href',
-                handler:joinUrl
+                fn:['url']
             }
         }
     },
@@ -130,7 +130,7 @@ const webs=[
             url:{
                 key:'a',
                 attr:'href',
-                handler:joinUrl
+                fn:['url']
             }
         }
     },
@@ -159,7 +159,7 @@ const webs=[
             url:{
                 key:'a',
                 attr:'href',
-                handler:joinUrl
+                fn:['url']
             }
         }
 
@@ -187,7 +187,7 @@ const webs=[
             url:{
                 key:'a',
                 attr:'href',
-                handler:joinUrl
+                fn:['url']
             }
         }
     },
@@ -212,7 +212,7 @@ const webs=[
             url:{
                 key:'a',
                 attr:'href',
-                handler:joinUrl
+                fn:['url']
             }
         }
     },
@@ -227,7 +227,7 @@ const webs=[
             url:{
                 key:'',
                 attr:'href',
-                handler:joinUrl
+                fn:['url']
             },
             image:{
                 key:'img',
@@ -259,7 +259,15 @@ const webs=[
     return txt.substring(pFirst+first.length,pLast)
 }
 
-
+const convertOpts={
+    url:(url,web)=>{
+        if(!url) return ""
+        const root=web.root;
+        if(url.startsWith('/')) url=root+url;
+        else if(!url.startsWith('http')) url=root+"/"+url;
+        return url;
+    }
+}
 /**
  * get infor from config
  * @param { import('.').ConfigData } config   extract data
@@ -270,31 +278,17 @@ function extractInfor(config,node,web){
     if(!config||!Object.keys(config).length) return ""
     if(!node) return ""
     if(config.value) return config.value;
-    // if(!config.key) return ""
     const _node=node(config.key);
     let value=config.attr?_node.attr(config.attr):_node.text();
     value=(config.prefix||config.subfix)?extractString(value,config.prefix,config.subfix):value;
     value=config.ignore?value.replace(config.ignore,""):value;
     value=(value)?value.trim():value;
-    value=config.handler?config.handler(value,web):value;
-    if(_URL_MONITOR && web.root==_URL_MONITOR)
-        console.log("debug-354:",{config,root:web.root,_node:_node.toString(),value})
+    if(config.fn&&config.fn.length )
+        config.fn.forEach(fn=>{
+        value=convertOpts[fn](value,web)})
     return value;
 }
 
-/**
- * 
- * @param {string} url 
- * @param {string} web 
- * @returns {string}
- */
-function joinUrl(url,web){
-    if(!url) return ""
-    const root=web.root;
-    if(url.startsWith('/')) url=root+url;
-    else if(!url.startsWith('http')) url=root+"/"+url;
-    return url;
-}
 
 
 module.exports={webs,extractInfor};
