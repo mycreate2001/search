@@ -22,7 +22,7 @@ let arrs = [];
             build('#content')
             fetch('/api/search?q=' + keys.join("+")).then(res => res.json())
                 .then(result => {
-                    // console.log("result",{result})
+                    console.log({raws:result})
                     arrs = result.arrs.map(arr => {
                         const price = getNumber(arr.price);
                         let points=0;

@@ -230,7 +230,7 @@ const webs=[
                 fn:['url']
             },
             image:{
-                key:'img',
+                key:'picture.webpimg-container img',
                 attr:'src'
             },
             name:{
@@ -278,7 +278,7 @@ function extractInfor(config,node,web){
     if(!config||!Object.keys(config).length) return ""
     if(!node) return ""
     if(config.value) return config.value;
-    const _node=node(config.key);
+    const _node=config.key?node(config.key):node(this);
     let value=config.attr?_node.attr(config.attr):_node.text();
     value=(config.prefix||config.subfix)?extractString(value,config.prefix,config.subfix):value;
     value=config.ignore?value.replace(config.ignore,""):value;
