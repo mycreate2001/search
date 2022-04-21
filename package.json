@@ -6,7 +6,7 @@
     "express": "^4.17.3"
   },
   "name": "search",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "main": "index.js",
   "devDependencies": {
     "nodemon": "^2.0.15"
