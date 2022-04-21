@@ -13,7 +13,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "nodemon src/index",
+    "dev": "nodemon --watch src src/index",
     "start": "node src/index.js"
   },
   "keywords": [],

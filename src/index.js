@@ -30,8 +30,8 @@ app.get("/api/search",(req,res)=>{
             // console.log("\n-checkpoint --------------------\n",{text})
             const $=cheerio.load(text.data);
             const nodes=$(web.key);
-            if(_URL_MONITOR && web.root==_URL_MONITOR)
-                console.log("test-218:",{root:web.root,nodes:nodes.toString(),body:$('body').toString()})
+            if(web.root=='https://shopee.vn')
+                console.log("\mindex.js TEST:34\n-----------------------\n",{root:web.root,nodes})
             const outs=[];
             if(!nodes.length) return outs;
             
