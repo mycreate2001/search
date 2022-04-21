@@ -2,7 +2,14 @@
     display: flex;
     flex-direction: column;
     padding: 8px;
-    border: 0.1px whitesmoke solid;
+    border: 0.1px whitesmoke solid;    
+}
+.item:hover{
+    -webkit-box-shadow: 0 2px 12px 0 rgb(0 0 0 / 30%);
+    box-shadow: 0 2px 12px 0 rgb(0 0 0 / 30%);
+    -webkit-transform: scale(1.02);
+    transform: scale(1.02);
+    z-index: 1;
 }
 
 img.item_image {
