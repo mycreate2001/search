@@ -278,7 +278,7 @@ function extractInfor(config,node,web){
     if(!config||!Object.keys(config).length) return ""
     if(!node) return ""
     if(config.value) return config.value;
-    const _node=config.key?node(config.key):node(this);
+    const _node=config.key?node.find(config.key):node;
     let value=config.attr?_node.attr(config.attr):_node.text();
     value=(config.prefix||config.subfix)?extractString(value,config.prefix,config.subfix):value;
     value=config.ignore?value.replace(config.ignore,""):value;

@@ -28,19 +28,18 @@ app.get("/api/search",(req,res)=>{
         return fetch(_host,{timeout:3000})
         .then(text=>{
             const $=cheerio.load(text);
-            const nodes=$('body').find(web.key);
+            const nodes=$(web.key);
             if(_URL_MONITOR && web.root==_URL_MONITOR)
                 console.log("test-218:",{root:web.root,nodes:nodes.toString(),body:$('body').toString()})
             const outs=[];
             if(!nodes.length) return outs;
             
             nodes.each((i,e)=>{
-                const node=cheerio.load(e);
                 const out={};
                 //extract 
                 Object.keys(web.configs).forEach(key=>{
                     const config=web.configs[key];
-                    out[key]=extractInfor(config,node,web);
+                    out[key]=extractInfor(config,$(e),web);
                 })
                 outs.push({...out,logo:web.logo})
             }) 
