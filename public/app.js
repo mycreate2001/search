@@ -1,6 +1,6 @@
 let arrs = [];
         let views = [];
-        const form = document.querySelector("form#search");
+        const form = document.querySelector("form#form-search");
         form.addEventListener("submit",(e)=>{
             search();
             e.preventDefault();
