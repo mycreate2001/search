@@ -74,7 +74,7 @@ let arrs = [];
         function build(selector) {
             // console.log("element:",{selector,element:document.querySelector(selector)})
             const content = views.map(data => `
-                <div class='col-xs-6 col-sm-6 col-md-3 col-lg-3 .col-xl-3 item' >
+                <div class='col-xs-6 col-sm-6 col-md-3 col-lg-3 col-xl-2 item' >
                     <img src='${data.image}' class='item_image'>
                     <img src='${data.logo}' class='logo'>
                     <a class='item_title' href="${data.url}" target="_blank">${data.name}</a>
