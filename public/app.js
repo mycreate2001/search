@@ -64,10 +64,34 @@ let arrs = [];
             return out;
         }
         /** update */
-        function update() {
-            views = arrs.sort((a, b) => b.points - a.points);
+        function update(type='point') {
+            const sort=createSort(type)
+            views = arrs.sort(sort);
             // console.log({views});
             build('#content')
+        }
+        /**
+         * 
+         * @param {'point'|'price'} type 
+         */
+        function createSort(type='point'){
+            console.log("type=",type);
+            if(type=='point'){
+                return (a,b)=>{
+                    if(a.points<b.points) return 1
+                    if(a.points>b.points) return -1
+                    if(a.price>b.price) return 1
+                    return -1
+                }
+            }
+            if(type=='price'){
+                return (a,b)=>{
+                    if(a.price>b.price) return 1
+                    if(a.price<b.price) return -1
+                    if(a.points>b.points) return -1
+                    return 1
+                }
+            }
         }
 
         /** build */
