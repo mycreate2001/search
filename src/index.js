@@ -18,7 +18,7 @@ app.listen(PORT);
 app.get("/",(req,res)=>{
     res.render("index");
 })
-const _URL_MONITOR="https://cellphones.com.vn"
+const _URL_MONITOR="https://shopee.vn"
 app.get("/api/search",(req,res)=>{
     const keys=(req.query['q']).trim().split(/[,. :;+]/g);
     console.log("001. input '%s'",keys.join(" "))

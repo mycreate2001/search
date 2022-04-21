@@ -1,4 +1,4 @@
-const _URL_MONITOR="https://cellphones.com.vn"
+const _URL_MONITOR="https://shopee.vn"
 const webs=[
     {   
         //phucanh.vn
