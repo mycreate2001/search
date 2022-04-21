@@ -1,7 +1,6 @@
 const express=require('express')
 const cheerio=require('cheerio');
 const axios=require('axios').default
-const {fetch}=require('./lib/util')
 const PORT=4000;
 const {webs,extractInfor}=require('./db.js');
 //
