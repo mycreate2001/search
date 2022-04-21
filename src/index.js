@@ -1,5 +1,6 @@
 const express=require('express')
 const cheerio=require('cheerio');
+const axios=require('axios').default
 const {fetch}=require('./lib/util')
 const PORT=4000;
 const {webs,extractInfor}=require('./db.js');
@@ -17,7 +18,7 @@ app.listen(PORT);
 app.get("/",(req,res)=>{
     res.render("index");
 })
-const _URL_MONITOR="https://shopee.vn"
+const _URL_MONITOR="https://cellphones.com.vn"
 app.get("/api/search",(req,res)=>{
     const keys=(req.query['q']).trim().split(/[,. :;+]/g);
     console.log("001. input '%s'",keys.join(" "))
@@ -25,9 +26,10 @@ app.get("/api/search",(req,res)=>{
         let _host=web.root+web.search+keys.join(web.delimiter);
         if(web.search2&&web.delimiter2) _host+=web.search2+keys.join(web.delimiter2)
         console.log("%s. fetch '%s'",_pos,_host)
-        return fetch(_host,{timeout:3000})
+        return axios.get(_host)
         .then(text=>{
-            const $=cheerio.load(text);
+            // console.log("\n-checkpoint --------------------\n",{text})
+            const $=cheerio.load(text.data);
             const nodes=$(web.key);
             if(_URL_MONITOR && web.root==_URL_MONITOR)
                 console.log("test-218:",{root:web.root,nodes:nodes.toString(),body:$('body').toString()})

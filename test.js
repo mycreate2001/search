@@ -1,12 +1,16 @@
-const cheerio=require('cheerio')
+const axios=require('axios').default
+const {fetch} =require('./src/lib/util')
+const urls=[
+    'https://cellphones.com.vn/catalogsearch/result/?q=dell+inspiron+5410',
 
-const html=`<ul id="fruits">
-<li class="apple">Apple</li>
-<li class="orange">Orange</li>
-<li class="pear">Pear</li>
-</ul>"`
+]
 
-const node=cheerio.load(html);
+// urls.forEach(url=>{
+//     axios.get(url).then(res=>console.log("result",{res}))
+//     .catch(err=>console.log("error",{err}))
+// })
 
-console.log("test1:",{node:node})
-console.log("\ntest2:",{test2:node(this)})
+urls.forEach(url=>{
+    fetch(url).then(res=>console.log("result",{res}))
+    .catch(err=>console.log("error",{err}))
+})
