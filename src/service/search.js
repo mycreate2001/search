@@ -19,6 +19,7 @@ function search(key){
         const alls=webs.map((web,_pos)=>{
             let _host=web.root+web.search+keys.join(web.delimiter);
             if(web.search2&&web.delimiter2) _host+=web.search2+keys.join(web.delimiter2)
+            _host=encodeURI(_host);//debug
             console.log("%s. fetch '%s'",_pos,_host)
             return axios.get(_host)
             .then(text=>{
