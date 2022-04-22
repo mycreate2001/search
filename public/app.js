@@ -19,10 +19,11 @@ let arrs = [];
             const keys = (keyword.value + "").toLowerCase().trim().split(/[;,.: ]/g).filter(x => x && x != ' ');
             console.log("Keys",keys)
             views=[];
-            build('#content')
+            build('#content');
+            const _startTime=new Date().getTime();
             fetch('/api/search?q=' + keys.join("+")).then(res => res.json())
                 .then(result => {
-                    console.log({raws:result})
+                    console.log({raws:result,time:`${(new Date().getTime()-_startTime)/1000} seconds`})
                     arrs = result.arrs.map(arr => {
                         const price = getNumber(arr.price);
                         let points=0;
