@@ -27,11 +27,13 @@ function search(key){
             console.log("%s. '%s'",_pos,_host)
             const _time=new Date().getTime();
             return axios.get(_host,{maxRedirects:3,timeout:5000})
-            .then(text=>{
-                const $=cheerio.load(text.data);
+            .then(res=>{
+                const $=cheerio.load(res.data);
                 const nodes=$(web.key);
                 const outs=[];
-                if(!nodes.length) return outs;
+                if(!nodes.length) {
+                    // console.log("\n-------------- debug -----------\n",res.data)
+                    return outs}
                 
                 nodes.each((i,e)=>{
                     const out={};
@@ -42,11 +44,14 @@ function search(key){
                     })
                     outs.push({...out,logo:web.logo,root:web.root})
                 })
-                // console.log("%s '%s'",_pos,web.root,outs.length,"\t",(new Date().getTime()-_time)/1000,"seconds");
-                _result.push({url:_host,time:(new Date().getTime()-_time)/1000,length:outs.length})
                 return outs;
             })
             .catch(err=>{console.log("\nERROR search:41\n--------------------",{host:_host,err});return []})
+            .then(outs=>{
+                _result.push({url:_host,time:(new Date().getTime()-_time)/1000,length:outs.length})
+                // console.log("\n--------------test:",outs)
+                return outs;
+            })
         })
         //handler result
         Promise.all(alls).then((result)=>{
@@ -56,6 +61,8 @@ function search(key){
         })
         .catch(err=>reject(err))
         .finally(()=>{
+            console.log("result");
+            // _result.forEach((r,p)=>console.log("%d '%s' ",p,r.url,"\t\t=>",r.length,"\ttime:",r.time,"seconds "))
             console.table(_result);
             const _lastTime=(new Date().getTime()-_startTime)/1000
             console.log("done! search '%s' results:",key,length," time: ",_lastTime,"seconds");
