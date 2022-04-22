@@ -18,13 +18,15 @@ function search(key){
         const keys=key.trim().split(/[,. :;+]/g);
         const webs=db.getAll();
         //fetch data
-        
+        const _result=[];                       //  sumaries result
+        const _startTime=new Date().getTime();  //  checking time
         const alls=webs.map((web,_pos)=>{
             let _host=web.root+web.search+keys.join(web.delimiter);
             if(web.search2&&web.delimiter2) _host+=web.search2+keys.join(web.delimiter2)
             _host=encodeURI(_host);//debug
             console.log("%s. '%s'",_pos,_host)
-            return axios.get(_host,{maxRedirects:5})
+            const _time=new Date().getTime();
+            return axios.get(_host,{maxRedirects:3,timeout:5000})
             .then(text=>{
                 const $=cheerio.load(text.data);
                 const nodes=$(web.key);
@@ -39,7 +41,9 @@ function search(key){
                         out[key]=extractInfor(config,$(e),web);
                     })
                     outs.push({...out,logo:web.logo,root:web.root})
-                }) 
+                })
+                // console.log("%s '%s'",_pos,web.root,outs.length,"\t",(new Date().getTime()-_time)/1000,"seconds");
+                _result.push({url:_host,time:(new Date().getTime()-_time)/1000,length:outs.length})
                 return outs;
             })
             .catch(err=>{console.log("\nERROR search:41\n--------------------",{host:_host,err});return []})
@@ -52,7 +56,9 @@ function search(key){
         })
         .catch(err=>reject(err))
         .finally(()=>{
-            console.log("done! search '%s' results ",key,length)
+            console.table(_result);
+            const _lastTime=(new Date().getTime()-_startTime)/1000
+            console.log("done! search '%s' results:",key,length," time: ",_lastTime,"seconds");
         })
     })
 }
