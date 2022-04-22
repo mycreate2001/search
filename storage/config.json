@@ -188,7 +188,7 @@
 
     {   "root":"https://shopee.vn",
         "search":"/search?keyword=",
-        "delimiter":"%20",
+        "delimiter":" ",
         "key":"div.shopee-search-item-result__item",
         "logo":"https://brandfetch.com/_next/image?url=https%3A%2F%2Fasset.brandfetch.io%2FidGECW8fnU%2FidKAwcdNXs.png&w=128&q=75",
         "configs":{
@@ -212,7 +212,7 @@
 
     {   "root":"https://tiki.vn",
         "search":"/search?q=",
-        "delimiter":"%20",
+        "delimiter":" ",
         "logo":"https://danhgialon.com/wp-content/uploads/2018/04/mua-tu-lanh-tren-tiki.png",
         "key":"a.product-item",
         "configs":{
@@ -230,6 +230,32 @@
             },
             "price":{
                 "key":"div.price-discount__price"
+            }
+        }
+    },
+    
+    {
+        "root":"https://hc.com.vn",
+        "search":"/ords/search--",
+        "delimiter":" ",
+        "logo":"https://hc.com.vn/i/hc_ecommerce/image/bg/logo.png",
+        "key":"div.product-layout",
+        "configs":{
+            "url":{
+                "key":"a",
+                "attr":"href",
+                "fn":["url"]
+            },
+            "image":{
+                "key":"img",
+                "attr":"data-src",
+                "fn":["url"]
+            },
+            "name":{
+                "key":"div.right-block a"
+            },
+            "price":{
+                "key":"p.price span.price-new"
             }
         }
     }

@@ -21,7 +21,7 @@ function search(key){
             if(web.search2&&web.delimiter2) _host+=web.search2+keys.join(web.delimiter2)
             _host=encodeURI(_host);//debug
             console.log("%s. fetch '%s'",_pos,_host)
-            return axios.get(_host)
+            return axios.get(_host,{maxRedirects:3})
             .then(text=>{
                 const $=cheerio.load(text.data);
                 const nodes=$(web.key);
