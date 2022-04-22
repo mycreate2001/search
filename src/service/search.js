@@ -23,7 +23,7 @@ function search(key){
             let _host=web.root+web.search+keys.join(web.delimiter);
             if(web.search2&&web.delimiter2) _host+=web.search2+keys.join(web.delimiter2)
             _host=encodeURI(_host);//debug
-            console.log("%s. fetch '%s'",_pos,_host)
+            // console.log("%s. fetch '%s'",_pos,_host)
             return axios.get(_host,{maxRedirects:5})
             .then(text=>{
                 const $=cheerio.load(text.data);
@@ -40,19 +40,22 @@ function search(key){
                     })
                     outs.push({...out,logo:web.logo,root:web.root})
                 }) 
-                return outs;
+                return {url:web.root,outs};
             })
             .catch(err=>{console.log("\nERROR search:41\n--------------------",{host:_host,err});return []})
         })
         //handler result
-        Promise.all(alls).then(result=>{
-            const arrs=result.reduce((acc,cur)=>[...acc,...cur],[]).filter(x=>x);
+        Promise.all(alls).then((result)=>{
+            const arrs=result.reduce((acc,cur)=>[...acc,...cur.outs],[]).filter(x=>x);
             length=arrs.length;
+            result.forEach((x,pos)=>{
+                console.log("%s %s\t\t",pos,x.url,x.outs.length)
+            })
             return resolve(arrs);
         })
         .catch(err=>reject(err))
         .finally(()=>{
-            console.log("done! search %s results\n",length)
+            console.log("done! search '%s' results ",key,length)
         })
     })
 }
