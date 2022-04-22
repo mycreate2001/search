@@ -13,15 +13,18 @@ const db=new LocalDatabase('config');
 function search(key){
     return new Promise((resolve,reject)=>{
         // return resolve('ok')
+        let length=0;
+        console.log("\n\nSearch='%s'\n--------------------------------------",key);
         const keys=key.trim().split(/[,. :;+]/g);
         const webs=db.getAll();
         //fetch data
+        
         const alls=webs.map((web,_pos)=>{
             let _host=web.root+web.search+keys.join(web.delimiter);
             if(web.search2&&web.delimiter2) _host+=web.search2+keys.join(web.delimiter2)
             _host=encodeURI(_host);//debug
             console.log("%s. fetch '%s'",_pos,_host)
-            return axios.get(_host,{maxRedirects:3})
+            return axios.get(_host,{maxRedirects:5})
             .then(text=>{
                 const $=cheerio.load(text.data);
                 const nodes=$(web.key);
@@ -35,7 +38,7 @@ function search(key){
                         const config=web.configs[key];
                         out[key]=extractInfor(config,$(e),web);
                     })
-                    outs.push({...out,logo:web.logo})
+                    outs.push({...out,logo:web.logo,root:web.root})
                 }) 
                 return outs;
             })
@@ -44,9 +47,13 @@ function search(key){
         //handler result
         Promise.all(alls).then(result=>{
             const arrs=result.reduce((acc,cur)=>[...acc,...cur],[]).filter(x=>x);
+            length=arrs.length;
             return resolve(arrs);
         })
         .catch(err=>reject(err))
+        .finally(()=>{
+            console.log("done! search %s results\n",length)
+        })
     })
 }
 

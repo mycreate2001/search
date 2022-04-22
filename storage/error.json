@@ -1,0 +1,79 @@
+{
+    "errors": [
+        {   "name":"to many redirect",
+            "urls":[
+                {   "root":"https://hc.com.vn",
+                    "search":"/ords/search--",
+                    "delimiter":" ",
+                    "logo":"https://hc.com.vn/i/hc_ecommerce/image/bg/logo.png",
+                    "key":"div.product-layout",
+                    "configs":{
+                        "url":{
+                            "key":"a",
+                            "attr":"href",
+                            "fn":["url"]
+                        },
+                        "image":{
+                            "key":"img",
+                            "attr":"data-src",
+                            "fn":["url"]
+                        },
+                        "name":{
+                            "key":"div.right-block a"
+                        },
+                        "price":{
+                            "key":"p.price span.price-new"
+                        }
+                    }
+                }
+            ]
+        },
+
+        {   "name":"get get any result",
+            "urls":[
+                {   "root":"https://shopee.vn",
+                    "search":"/search?keyword=",
+                    "delimiter":" ",
+                    "key":"div.shopee-search-item-result__item",
+                    "logo":"https://brandfetch.com/_next/image?url=https%3A%2F%2Fasset.brandfetch.io%2FidGECW8fnU%2FidKAwcdNXs.png&w=128&q=75",
+                    "configs":{
+                        "image":{
+                            "key":"img",
+                            "attr":"src"
+                        },
+                        "price":{
+                            "key":"div.zp9xm9 span._3c5u7X"
+                        },
+                        "name":{
+                            "key":"div._3GAFiR"
+                        },
+                        "url":{
+                            "key":"a",
+                            "attr":"href",
+                            "fn":["url"]
+                        }
+                    }
+                },
+            
+                {   "root":"https://fptshop.com.vn",
+                    "search":"/tim-kiem/",
+                    "delimiter":"-",
+                    "logo":"https://static.wikia.nocookie.net/logos/images/6/60/FPT_Shop.png/revision/latest/scale-to-width-down/180?cb=20211102105457&path-prefix=vi",
+                    "key":"div.cdt-product",
+                    "configs":{
+                        "url":{
+                            "key":"div.cdt-product__img a",
+                            "attr":"href"
+                        },
+                        "name":{
+                            "key":"div.cdt-product__info a"
+                        },
+                        "price":{
+                            "key":"div.cdt-product__info div.cdt-product__show-promo div.progress"
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
