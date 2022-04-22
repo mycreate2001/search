@@ -208,6 +208,31 @@
                 "key":"div.price-discount__price"
             }
         }
+    },
+
+    {
+        "root":"https://www.lazada.vn",
+        "search":"/catalog/?spm=a2o4n.searchlist.search.5.6e2c40776p5DZ5&q=",
+        "delimiter":" ",
+        "logo":"https://laz-img-cdn.alicdn.com/images/ims-web/TB1T7K2d8Cw3KVjSZFuXXcAOpXa.png",
+        "key":"div.Bm3ON[data-qa-locator='product-item']",
+        "configs":{
+            "image":{
+                "key":"div.picture-wrapper img",
+                "attr":"src"
+            },
+            "url":{
+                "key":"div._95X4G a",
+                "attr":"href"
+            },
+            "price":{
+                "key":"div.buTCk span.ooOxS"
+            },
+            "name":{
+                "key":"div.buTCk div.RfADt a"
+
+            }
+        }
     }
 
     
