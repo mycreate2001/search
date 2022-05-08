@@ -17,7 +17,7 @@ class Database{
         this.#name=name;
         this.#file=path.join(__dirname,"..","..",_STORAGE_PATH,name+'.json');
         console.log("file:'%s'",this.#file);
-        this.#db=this.#connect(this.#file);
+        this.#db=this.connect(this.#file);
         this.#idLength=opts.idLength||_ID_LENGHT_DEFAULT_;
     }
 
@@ -147,7 +147,7 @@ class Database{
      * @param {string} path 
      * @returns {any[]} data on json file
      */
-    #connect(path){
+    connect(path){
         try{
             let data=fs.readFileSync(path,{encoding:'utf8',flag:'r+'});
             // console.log("\nlocal-database.js \ test-001:153\n--------------------------------\n",{data})
